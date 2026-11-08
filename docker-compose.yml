@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  billing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tc-billing-service
+    ports:
+      - "5102:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MongoDB: mongodb://admin:tc-local-pass@host.docker.internal:27017/TechChallengeBilling?authSource=admin
+      RabbitMQ__Host: host.docker.internal
+      RabbitMQ__Port: "5672"
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      Jwt__Key: tc-local-dev-secret-key-min32chars
+      Jwt__Issuer: TechChallenger
+      Jwt__Audience: TechChallenger
+      MercadoPago__AccessToken: ""
+      MercadoPago__WebhookSecret: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

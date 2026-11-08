@@ -1,0 +1,23 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.log
+
+# User Secrets (local dev — gerados por dotnet user-secrets)
+# Ficam em %APPDATA%\Microsoft\UserSecrets, não no repo.
+
+# Variáveis de ambiente locais
+.env
+.env.*
+appsettings.Development.json
+
+# Docker
+.docker/
+
+# IDE
+.idea/
+*.sln.DotSettings.user
+.rider/

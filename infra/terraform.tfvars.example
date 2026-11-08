@@ -1,0 +1,19 @@
+# Copie para terraform.tfvars e preencha os valores reais.
+# NUNCA commite terraform.tfvars no git — ele está no .gitignore.
+#
+# Pré-requisito: aplicar o OS Service infra primeiro (TechChallenge.OS/infra).
+# Os recursos compartilhados (VPC, EC2, ECS cluster) são localizados via data sources.
+
+aws_region   = "us-east-1"
+environment  = "prod"
+project_name = "techchallenge"  # deve ser idêntico ao valor usado no OS Service infra
+
+# Mesmos valores usados no OS Service infra
+mongodb_root_password = "MinhaS3nhaSegura"
+rabbitmq_username     = "techchallenge"
+rabbitmq_password     = "MinhaS3nhaRabbit"
+jwt_key               = "sua-chave-jwt-com-pelo-menos-32-caracteres-aqui"
+
+# Exclusivos do Billing Service
+mercadopago_access_token   = "APP_USR-xxxxxxxx"
+mercadopago_webhook_secret = "seu-webhook-secret"
