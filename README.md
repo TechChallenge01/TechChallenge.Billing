@@ -2,6 +2,10 @@
 
 > Fase 4 — FIAP SOAT · Arquitetura de Microsserviços com Saga Pattern
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=TechChallenge01_TechChallenge.Billing&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=TechChallenge01_TechChallenge.Billing)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TechChallenge01_TechChallenge.Billing&metric=coverage)](https://sonarcloud.io/summary/new_code?id=TechChallenge01_TechChallenge.Billing)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=TechChallenge01_TechChallenge.Billing&metric=bugs)](https://sonarcloud.io/summary/new_code?id=TechChallenge01_TechChallenge.Billing)
+
 Microsserviço responsável pela **geração de orçamentos, aprovação/rejeição e processamento de pagamentos** via Mercado Pago, parte do sistema TechChallenger (oficina mecânica com escala nacional).
 
 ---
