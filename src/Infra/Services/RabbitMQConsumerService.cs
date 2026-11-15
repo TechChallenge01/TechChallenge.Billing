@@ -87,13 +87,16 @@ public class RabbitMQConsumerService : BackgroundService
                     {
                         OrdemServicoId = payload.OrdemServicoId,
                         ClienteId = payload.ClienteId,
-                        Itens = payload.Itens.Select(i => new ItemOrcamentoRequestDTO
+                        Itens = new List<ItemOrcamentoRequestDTO>
                         {
-                            Descricao = i.Descricao,
-                            Quantidade = i.Quantidade,
-                            ValorUnitario = i.ValorUnitario,
-                            Tipo = i.Tipo
-                        }).ToList()
+                            new()
+                            {
+                                Descricao = payload.Diagnostico,
+                                Quantidade = 1,
+                                ValorUnitario = payload.ValorEstimado,
+                                Tipo = "Servico"
+                            }
+                        }
                     }, systemUserId, eventPublisher, default);
                     break;
                 }
@@ -125,7 +128,6 @@ public class RabbitMQConsumerService : BackgroundService
         await base.StopAsync(cancellationToken);
     }
 
-    private record DiagnosticoConcluido(Guid OrdemServicoId, Guid ClienteId, List<DiagnosticoItem> Itens);
-    private record DiagnosticoItem(string Descricao, int Quantidade, decimal ValorUnitario, string Tipo);
+    private record DiagnosticoConcluido(Guid OrdemServicoId, Guid ClienteId, string Diagnostico, decimal ValorEstimado);
     private record ExecucaoFalhou(Guid OrdemServicoId, Guid? PagamentoId);
 }
