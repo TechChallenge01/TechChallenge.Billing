@@ -6,6 +6,7 @@ using Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Shared.DTOs.Orcamentos.Request;
@@ -16,14 +17,16 @@ public class RabbitMQConsumerService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<RabbitMQConsumerService> _logger;
     private IConnection? _connection;
     private IChannel? _channel;
     private const string Exchange = "tech.saga";
 
-    public RabbitMQConsumerService(IServiceProvider serviceProvider, IConfiguration configuration)
+    public RabbitMQConsumerService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<RabbitMQConsumerService> logger)
     {
         _serviceProvider = serviceProvider;
         _configuration = configuration;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,8 +39,10 @@ public class RabbitMQConsumerService : BackgroundService
             Password = _configuration["RabbitMQ:Password"] ?? "guest"
         };
 
+        _logger.LogInformation("RabbitMQConsumer connecting to {Host}:{Port}", factory.HostName, factory.Port);
         _connection = await factory.CreateConnectionAsync(stoppingToken);
         _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
+        _logger.LogInformation("RabbitMQConsumer connected");
 
         await _channel.ExchangeDeclareAsync(Exchange, ExchangeType.Topic, durable: true, cancellationToken: stoppingToken);
 
@@ -68,6 +73,7 @@ public class RabbitMQConsumerService : BackgroundService
     {
         var body = Encoding.UTF8.GetString(ea.Body.ToArray());
         var routingKey = ea.RoutingKey;
+        _logger.LogInformation("RabbitMQConsumer received message. RoutingKey={RoutingKey} Body={Body}", routingKey, body);
 
         try
         {
@@ -113,10 +119,12 @@ public class RabbitMQConsumerService : BackgroundService
                 }
             }
 
+            _logger.LogInformation("RabbitMQConsumer processed message. RoutingKey={RoutingKey}", routingKey);
             await _channel!.BasicAckAsync(ea.DeliveryTag, false);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "RabbitMQConsumer failed to process message. RoutingKey={RoutingKey} Body={Body}", routingKey, body);
             await _channel!.BasicNackAsync(ea.DeliveryTag, false, false);
         }
     }
