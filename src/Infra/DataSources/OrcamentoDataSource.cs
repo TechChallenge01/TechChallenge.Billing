@@ -22,6 +22,7 @@ public class OrcamentoDataSource : IOrcamentoDataSource
         var filter = Builders<OrcamentoInputDTO>.Filter.Empty;
         var total = (int)await _collection.CountDocumentsAsync(filter, cancellationToken: ct);
         var items = await _collection.Find(filter)
+            .SortByDescending(x => x.DataCriacao)
             .Skip((page - 1) * pageSize)
             .Limit(pageSize)
             .ToListAsync(ct);
