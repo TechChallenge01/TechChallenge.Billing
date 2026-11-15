@@ -38,27 +38,34 @@ public class AprovarOrcamentoUseCase
         var pagamento = new Pagamento(orcamento.Id, orcamento.OrdemServicoId, orcamento.ClienteId, orcamento.ValorTotal, idUsuario);
         await _pagamentoGateway.Create(pagamento, ct);
 
-        var cobranca = await _mercadoPagoService.CriarCobranca(new()
-        {
-            PagamentoId = pagamento.Id,
-            ClienteId = orcamento.ClienteId,
-            Valor = orcamento.ValorTotal,
-            Descricao = $"OS {orcamento.OrdemServicoId} — Reparo veicular",
-            EmailCliente = emailCliente
-        }, ct);
-
-        pagamento.RegistrarCobranca(cobranca.IdTransacao, cobranca.LinkPagamento, idUsuario);
-        await _pagamentoGateway.Update(pagamento, ct);
-
         await _eventPublisher.PublishAsync("orcamento.aprovado", new
         {
             OrcamentoId = orcamento.Id,
             orcamento.OrdemServicoId,
             orcamento.ClienteId,
             PagamentoId = pagamento.Id,
-            LinkPagamento = cobranca.LinkPagamento
+            LinkPagamento = (string?)null
         }, ct);
 
-        return cobranca.LinkPagamento;
+        try
+        {
+            var cobranca = await _mercadoPagoService.CriarCobranca(new()
+            {
+                PagamentoId = pagamento.Id,
+                ClienteId = orcamento.ClienteId,
+                Valor = orcamento.ValorTotal,
+                Descricao = $"OS {orcamento.OrdemServicoId} — Reparo veicular",
+                EmailCliente = emailCliente
+            }, ct);
+
+            pagamento.RegistrarCobranca(cobranca.IdTransacao, cobranca.LinkPagamento, idUsuario);
+            await _pagamentoGateway.Update(pagamento, ct);
+
+            return cobranca.LinkPagamento;
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 }
